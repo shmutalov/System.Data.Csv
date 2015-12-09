@@ -120,7 +120,14 @@ namespace System.Data.Csv
         /// <returns></returns>
         private CsvReader GetCsvReader()
         {
-            return new CsvReader(File.OpenText(_parameters.Database), false, _parameters.Delimiter);
+            return new CsvReader(
+                File.OpenText(_parameters.Database), 
+                false, 
+                _parameters.Delimiter, 
+                _parameters.FieldWrapper,
+                _parameters.Escape,
+                '#',
+                ValueTrimmingOptions.None);
         }
 
         /// <summary>

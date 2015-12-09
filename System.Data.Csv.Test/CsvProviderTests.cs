@@ -14,7 +14,7 @@ namespace System.Data.Csv.Test
         private const string SmallCsvFile = @"C:\Sample - Superstore.csv";
         private const string LargeCsvFile = @"C:\AWLArge_FactInternetSales_1M.csv";
 
-        private const string ConnectionStringCsvTemplate = "Database={0};Password=;FirstRowIsHeader=True;StorageDir=;ForceStorageReload=True;AnalysisMethod=BestMatch;RowsToAnalyse=50";
+        private const string ConnectionStringCsvTemplate = "Database={0};Password=;FirstRowIsHeader=True;StorageDir=;ForceStorageReload=True;AnalysisMethod=BestMatch;RowsToAnalyse=50;Delimiter=,;FieldWrapper=\";Escape=\"";
 
         [Test]
         public void TestExcelConnectionToSmallCsvFile()

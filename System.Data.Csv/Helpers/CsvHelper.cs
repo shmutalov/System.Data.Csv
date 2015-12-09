@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Data.Csv.Enums;
 using System.Data.Csv.Models;
+using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using LumenWorks.Framework.IO.Csv;
@@ -164,7 +165,7 @@ namespace System.Data.Csv.Helpers
             reader.Reset();
             reader.MoveNext();
             
-            var table = new CsvTable(database);
+            var table = new CsvTable(Path.GetFileNameWithoutExtension(database));
             var columnsCount = reader.Current.Length;
 
             if (firstRowIsHeader)

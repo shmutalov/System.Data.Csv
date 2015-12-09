@@ -39,9 +39,19 @@ namespace System.Data.Csv.Models
         public bool FirstRowIsHeader { get; set; }
 
         /// <summary>
-        /// Value delimiter in CSV data
+        /// Field delimiter in CSV data
         /// </summary>
         public char Delimiter { get; set; }
+
+        /// <summary>
+        /// Field wrapper
+        /// </summary>
+        public char FieldWrapper { get; set; }
+
+        /// <summary>
+        /// Escape character in values
+        /// </summary>
+        public char Escape { get; set; }
 
         /// <summary>
         /// Forces reload all data of internal storage
@@ -98,6 +108,24 @@ namespace System.Data.Csv.Models
                         case CsvConnectionParameterNames.FirstRowIsHeader:
                             parameters.FirstRowIsHeader = splittedKeyVal[1].ToBool();
                             break;
+                        case CsvConnectionParameterNames.Delimiter:
+                            parameters.Delimiter = ','; // default delimiter
+
+                            if (!string.IsNullOrEmpty(splittedKeyVal[1]))
+                                parameters.Delimiter = splittedKeyVal[1][0];
+                            break;
+                        case CsvConnectionParameterNames.FieldWrapper:
+                            parameters.FieldWrapper = '"'; // default field wrapper
+
+                            if (!string.IsNullOrEmpty(splittedKeyVal[1]))
+                                parameters.FieldWrapper = splittedKeyVal[1][0];
+                            break;
+                        case CsvConnectionParameterNames.Escape:
+                            parameters.Escape = '\\'; // default field wrapper
+
+                            if (!string.IsNullOrEmpty(splittedKeyVal[1]))
+                                parameters.Escape = splittedKeyVal[1][0];
+                            break;
                         case CsvConnectionParameterNames.ForceStorageReload:
                             parameters.ForceStorageReload = splittedKeyVal[1].ToBool();
                             break;
@@ -136,11 +164,14 @@ namespace System.Data.Csv.Models
         public static string ToConnectionString(CsvConnectionParameters parameters)
         {
             return string.Format(
-                "{0}={1};{2}={3};{4}={5};{6}={7};{8}={9};{10}={11}",
+                "{0}={1};{2}={3};{4}={5};{6}={7};{8}={9};{10}={11};{12}={13};{14}={15}",
                 CsvConnectionParameterNames.Database, parameters.Database,
                 CsvConnectionParameterNames.StorageDirectory, parameters.StoregeDirectory,
                 CsvConnectionParameterNames.Password, parameters.Password,
                 CsvConnectionParameterNames.FirstRowIsHeader, parameters.FirstRowIsHeader,
+                CsvConnectionParameterNames.Delimiter, parameters.Delimiter,
+                CsvConnectionParameterNames.FieldWrapper, parameters.FieldWrapper,
+                CsvConnectionParameterNames.Escape, parameters.Escape,
                 CsvConnectionParameterNames.AnalysisMethod, parameters.AnalysisMethod,
                 CsvConnectionParameterNames.RowsToAnalyse, parameters.RowsToAnalyse
                 );

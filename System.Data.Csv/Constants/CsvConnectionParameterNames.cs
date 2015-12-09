@@ -30,14 +30,25 @@ namespace System.Data.Csv.Constants
         public const string Password = "PASSWORD";
 
         /// <summary>
-        /// Excel file type
-        /// </summary>
-        public const string Type = "TYPE";
-
-        /// <summary>
         /// First row of tables is header
         /// </summary>
         public const string FirstRowIsHeader = "FIRSTROWISHEADER";
+
+        /// <summary>
+        /// Field delimiter
+        /// </summary>
+        public const string Delimiter = "DELIMITER";
+
+        /// <summary>
+        /// Field wrapper character. 
+        /// For example "Some text" wrapped with double quote characters.
+        /// </summary>
+        public const string FieldWrapper = "FIELDWRAPPER";
+
+        /// <summary>
+        /// Escape character
+        /// </summary>
+        public const string Escape = "ESCAPE";
 
         /// <summary>
         /// Forces internal storage to reinitialize
