@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data.Csv.Enums;
 using System.Data.Csv.Extensions;
 using System.Data.Csv.Models;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
@@ -85,30 +86,60 @@ namespace System.Data.Csv.Helpers
             }
         }
 
+        private static Type GetBestType(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return typeof (string);
+
+            bool boolResult;
+            double doubleResult;
+            DateTime dateTimeResult;
+            
+            // firstly, try to parse datetime
+            if (DateTime.TryParse(value, out dateTimeResult))
+            {
+                return typeof (DateTime);
+            }
+
+            // then, try to parse decimal/double
+            if (double.TryParse(value, out doubleResult))
+            {
+                return typeof(double);
+            }
+
+            // then, try to parse boolean
+            if (bool.TryParse(value, out boolResult))
+            {
+                return typeof(double);
+            }
+
+            return typeof (string);
+        }
+
         /// <summary>
         /// Returns best data type for the given column by parsing rows
         /// </summary>
         /// <param name="method"></param>
-        /// <param name="dataTypes"></param>
+        /// <param name="preloadedData"></param>
         /// <param name="rows"></param>
         /// <param name="columnId"></param>
         /// <returns></returns>
-        private static Type GetColumnDataType(CsvColumnDataTypeAnalysisMethod method, object[][] dataTypes, int rows, int columnId)
+        private static Type GetColumnDataType(CsvColumnDataTypeAnalysisMethod method, object[][] preloadedData, int rows, int columnId)
         {
             var typesDict = new Dictionary<Type, int>();
             var result = typeof(string);
 
-            if (rows == 0 || columnId >= dataTypes[0].Length)
+            if (rows == 0 || columnId >= preloadedData[0].Length)
                 return result;
 
             for (var rowId = 0; rowId < rows; rowId++)
             {
-                var value = dataTypes[rowId][columnId];
+                var value = preloadedData[rowId][columnId];
 
                 if (value == null)
                     continue;
 
-                var type = value.GetType();
+                var type = GetBestType(value as string);
 
                 if (!typesDict.ContainsKey(type))
                     typesDict[type] = 0;
