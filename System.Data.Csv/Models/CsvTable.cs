@@ -8,12 +8,14 @@
 #endregion
 
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace System.Data.Csv.Models
 {
     /// <summary>
     /// Represents Excel table
     /// </summary>
+    [DefaultProperty("Name")]
     internal class CsvTable
     {
         public CsvTable()

@@ -117,9 +117,9 @@ namespace System.Data.Csv.Storage
         public void ImportData(CsvReader sourceReader, CsvConnectionParameters parameters, IDbConnection storageConnection)
         {
             List<object[]> preloadedValues;
-            var enumerator = sourceReader.GetEnumerator();
+            var reader = (IDataReader)sourceReader;
 
-            var table = CsvHelper.GetTable(parameters.Database, enumerator, parameters.FirstRowIsHeader, parameters.AnalysisMethod, parameters.RowsToAnalyse, out preloadedValues);
+            var table = CsvHelper.GetTable(parameters.Database, reader, parameters.FirstRowIsHeader, parameters.AnalysisMethod, parameters.RowsToAnalyse, out preloadedValues);
 
             CreateTable((SQLiteConnection)storageConnection, table);
 
@@ -136,16 +136,16 @@ namespace System.Data.Csv.Storage
                 }
             }
 
-            while (enumerator.MoveNext())
+            while (reader.Read())
             {
                 var values = new object[table.Columns.Count];
 
-                enumerator._GetValues(values);
+                reader.GetValues(values);
 
                 for (var columnId = 0; columnId < table.Columns.Count; columnId++)
                 {
                     values[columnId] = ToStorageValue(table.Columns[columnId].DataType,
-                        enumerator.Current[columnId]);
+                        values[columnId]);
                 }
 
                 preloadedValues.Add(values);

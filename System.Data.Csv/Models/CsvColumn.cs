@@ -7,11 +7,14 @@
 
 #endregion
 
+using System.ComponentModel;
+
 namespace System.Data.Csv.Models
 {
     /// <summary>
     /// Represents Excel table column
     /// </summary>
+    [DefaultProperty("Name")]
     internal class CsvColumn
     {
         public CsvColumn()

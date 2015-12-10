@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using System.Data.Csv.Enums;
+using System.Data.Csv.Extensions;
 using System.Data.Csv.Models;
 using System.IO;
 using System.Linq;
@@ -156,23 +157,24 @@ namespace System.Data.Csv.Helpers
         /// <returns></returns>
         public static CsvTable GetTable(
             [NotNull] string database,
-            CsvReader.RecordEnumerator reader, 
-            bool firstRowIsHeader, 
-            CsvColumnDataTypeAnalysisMethod method, 
-            int rowsToAnalyse, 
+            IDataReader reader,
+            bool firstRowIsHeader,
+            CsvColumnDataTypeAnalysisMethod method,
+            int rowsToAnalyse,
             out List<object[]> preloadedValues)
         {
             reader.Reset();
-            reader.MoveNext();
-            
+            reader.Read();
+
             var table = new CsvTable(Path.GetFileNameWithoutExtension(database));
-            var columnsCount = reader.Current.Length;
+            var columnsCount = reader.FieldCount;
 
             if (firstRowIsHeader)
             {
                 for (var columnId = 0; columnId < columnsCount; columnId++)
                 {
-                    var columnName = reader.Current[columnId] ?? string.Format("Column {0}", columnId + 1);
+                    var columnName = reader.GetString(columnId)
+                        ?? string.Format("Column {0}", columnId + 1);
 
                     table.Columns.Add(new CsvColumn(table, columnName));
                 }
@@ -192,18 +194,15 @@ namespace System.Data.Csv.Helpers
 
             if (rowsToAnalyse < 1)
                 rowsToAnalyse = 1;
-
+            
             for (var rowId = 0; rowId < rowsToAnalyse; rowId++)
             {
-                if (!reader.MoveNext())
+                if (!reader.Read())
                     break;
 
                 var values = new object[columnsCount];
 
-                for (var columnId = 0; columnId < columnsCount; columnId++)
-                {
-                    values[columnId] = reader.Current[columnId];
-                }
+                reader.GetValues(values);
 
                 preloadedDataList.Add(values);
             }

@@ -37,5 +37,16 @@ namespace System.Data.Csv.Extensions
 
             return enumerator.Current.Length;
         }
+
+        /// <summary>
+        /// Resets reader to initial position
+        /// </summary>
+        /// <param name="reader"></param>
+        public static void Reset(this IDataReader reader)
+        {
+            var csv = reader as CsvReader;
+
+            csv?.MoveTo(-1L);
+        }
     }
 }
