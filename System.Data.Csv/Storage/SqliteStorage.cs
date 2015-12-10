@@ -140,12 +140,10 @@ namespace System.Data.Csv.Storage
             {
                 var values = new object[table.Columns.Count];
 
-                reader.GetValues(values);
-
                 for (var columnId = 0; columnId < table.Columns.Count; columnId++)
                 {
                     values[columnId] = ToStorageValue(table.Columns[columnId].DataType,
-                        values[columnId]);
+                        reader.GetString(columnId));
                 }
 
                 preloadedValues.Add(values);

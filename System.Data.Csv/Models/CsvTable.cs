@@ -8,14 +8,12 @@
 #endregion
 
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace System.Data.Csv.Models
 {
     /// <summary>
     /// Represents Excel table
     /// </summary>
-    [DefaultProperty("Name")]
     internal class CsvTable
     {
         public CsvTable()
@@ -35,5 +33,10 @@ namespace System.Data.Csv.Models
         public string Name { get; set; }
 
         public List<CsvColumn> Columns { get; }
+
+        public override string ToString()
+        {
+            return Name ?? string.Empty;
+        }
     }
 }

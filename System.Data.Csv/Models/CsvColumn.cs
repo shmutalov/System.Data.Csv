@@ -7,14 +7,13 @@
 
 #endregion
 
-using System.ComponentModel;
+using JetBrains.Annotations;
 
 namespace System.Data.Csv.Models
 {
     /// <summary>
     /// Represents Excel table column
     /// </summary>
-    [DefaultProperty("Name")]
     internal class CsvColumn
     {
         public CsvColumn()
@@ -22,13 +21,13 @@ namespace System.Data.Csv.Models
             DataType = typeof(string);
         }
 
-        public CsvColumn(string name)
+        public CsvColumn([NotNull] string name)
             : this()
         {
             Name = name;
         }
 
-        public CsvColumn(CsvTable table, string name)
+        public CsvColumn([NotNull] CsvTable table, [NotNull] string name)
             : this(name)
         {
             Table = table;
@@ -48,5 +47,10 @@ namespace System.Data.Csv.Models
         /// Column's parent table
         /// </summary>
         public CsvTable Table { get; set; }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, {1}", Name, DataType.Name);
+        }
     }
 }

@@ -29,7 +29,7 @@ namespace System.Data.Csv.Test
 
                 using (var cmd = connection.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT 1 FROM `Orders` LIMIT 1";
+                    cmd.CommandText = string.Format("SELECT 1 FROM `Sample - Superstore` LIMIT 1");
                     var value = cmd.ExecuteScalar();
 
                     Assert.AreEqual(1, value);

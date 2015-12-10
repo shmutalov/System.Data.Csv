@@ -163,14 +163,16 @@ namespace System.Data.Csv.Helpers
             int rowsToAnalyse,
             out List<object[]> preloadedValues)
         {
-            reader.Reset();
-            reader.Read();
-
             var table = new CsvTable(Path.GetFileNameWithoutExtension(database));
             var columnsCount = reader.FieldCount;
 
+            // preloaded data list
+            var preloadedDataList = new List<object[]>();
+
             if (firstRowIsHeader)
             {
+                reader.Read();
+
                 for (var columnId = 0; columnId < columnsCount; columnId++)
                 {
                     var columnName = reader.GetString(columnId)
@@ -185,12 +187,7 @@ namespace System.Data.Csv.Helpers
                 {
                     table.Columns.Add(new CsvColumn(table, string.Format("Column {0}", columnId)));
                 }
-
-                reader.Reset();
             }
-
-            // preloaded data list
-            var preloadedDataList = new List<object[]>();
 
             if (rowsToAnalyse < 1)
                 rowsToAnalyse = 1;
@@ -202,7 +199,10 @@ namespace System.Data.Csv.Helpers
 
                 var values = new object[columnsCount];
 
-                reader.GetValues(values);
+                for (var columnId = 0; columnId < columnsCount; columnId++)
+                {
+                    values[columnId] = reader.GetString(columnId);
+                }
 
                 preloadedDataList.Add(values);
             }
