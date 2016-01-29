@@ -1,7 +1,7 @@
 ﻿using System.Data.Common;
-using System.Data.Csv.Enums;
 using System.Data.Csv.Models;
 using System.Data.Csv.Storage;
+using System.Data.Csv.Utils;
 using System.IO;
 using System.Reflection;
 using LumenWorks.Framework.IO.Csv;
@@ -65,6 +65,13 @@ namespace System.Data.Csv
         /// Storage helper
         /// </summary>
         private readonly IStorage _storage;
+
+        /// <summary>
+        /// When ForceDatabaseReload set from different connection to same database,
+        /// error can be thrown, cause resources are busy. We will add databases to rebuild
+        /// to that set. Remove database from set after rebuilt complete.
+        /// </summary>
+        private static readonly ConcurrentHashSet<string> ReloadingDatabases = new ConcurrentHashSet<string>();
 
         #endregion
 
@@ -136,16 +143,34 @@ namespace System.Data.Csv
         private void OpenInternal()
         {
             var database = _storage.GetDatabaseName(_parameters.Database, _storegeDir);
+            var loweredDatabaseName = database.ToLower();
 
             // Drop existing database, if ForceStorageReload is set
             if (_parameters.ForceStorageReload)
-                _storage.DropDatabase(database, _storegeDir);
+            {
+                // if database already marked as "loading", 
+                // we must wait for operation complete
 
-            if (!_storage.DatabaseExists(database, _storegeDir) ||
-                _parameters.ForceStorageReload)
+                if (ReloadingDatabases.Contains(loweredDatabaseName))
+                {
+                    // wait until database unmarked
+                    while (ReloadingDatabases.Contains(loweredDatabaseName))
+                    {
+                    }
+                }
+                else
+                {
+                    _storage.DropDatabase(database, _storegeDir);
+                }
+            }
+
+            if (!_storage.DatabaseExists(database, _storegeDir))
             {
                 try
                 {
+                    // mark database as "loading"
+                    ReloadingDatabases.Add(loweredDatabaseName);
+
                     _storage.CreateDatabase(database, _storegeDir);
 
                     using (
@@ -169,7 +194,11 @@ namespace System.Data.Csv
 
                     throw new CsvException(ex, "Cannot initialize storage for '{0}'", _parameters.Database);
                 }
-
+                finally
+                {
+                    // unmark database as "loading"
+                    ReloadingDatabases.Remove(loweredDatabaseName);
+                }
             }
 
             _storageConnection = _storage.GetConnection(
@@ -256,7 +285,7 @@ namespace System.Data.Csv
                 }
             }
 
-            throw new CsvException("Internal storage was not initialied");
+            throw new CsvException("Internal storage was not initialized");
         }
 
         #region Properties 
